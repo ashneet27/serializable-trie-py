@@ -15,14 +15,6 @@ class Trie:
         for word in words:
             self.insertWord(word)
 
-    @classmethod
-    def fromListOfWords(cls, words: list[str]) -> Trie:
-        return cls(words)
-
-    @classmethod
-    def fromSerializedTrie(serializedTrie: str) -> Trie:
-        pass
-
     def insertWord(self, word: str) -> None:
         curNode = self.root
         for c in word:
@@ -50,7 +42,12 @@ class Trie:
             return curNode.wordsWithPrefix
         return 0
 
-    def dfsRecursiveAndStoreInList(
+    def toListOfWords(self) -> list[str]:
+        words = []
+        self.__dfsRecursiveAndStoreInList(self.root, words)
+        return words
+
+    def __dfsRecursiveAndStoreInList(
         self, curNode: TrieNode, storingList: list[str], prefix: str = ""
     ) -> None:
         if curNode.isValidWord == True:
@@ -58,15 +55,27 @@ class Trie:
 
         for c in curNode.children:
             prefix += c
-            self.dfsRecursiveAndStoreInList(curNode.children[c], storingList, prefix)
+            self.__dfsRecursiveAndStoreInList(curNode.children[c], storingList, prefix)
             prefix = prefix[:-1]
 
-    def toListOfWords(self) -> list[str]:
-        words = []
-        self.dfsRecursiveAndStoreInList(self.root, words)
-        return words
+    def serialize(self) -> str:
+        serializedTrie = []
+        self.__serialize(self.root, serializedTrie)
+        return "".join(serializedTrie)
+
+    def __serialize(self, curNode: TrieNode, storingList: list[str]) -> None:
+        if curNode.isValidWord:
+            storingList.append("]")
+        for c in curNode.children:
+            storingList.append(c)
+            self.__serialize(curNode.children[c], storingList)
+        storingList.append(">")
+
+    @classmethod
+    def fromSerializedTrie(serializedTrie: str) -> Trie:
+        pass
 
 
 if __name__ == "__main__":
-    trie = Trie.fromListOfWords(["hello", "chat", "chips", "chip"])
-    print(trie.toListOfWords())
+    trie = Trie(["hello", "chat", "chips", "chip"])
+    print(trie.serialize())
