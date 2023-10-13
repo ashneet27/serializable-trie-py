@@ -99,5 +99,13 @@ class Trie:
 
 
 if __name__ == "__main__":
-    trie = Trie.fromSerializedTrie("hello]>>>>>chat]>>ip]s]>>>>>>")
-    print(trie.toListOfWords())
+    trie = Trie(["hello", "chat", "chip", "chips"])
+    print(f"List of words in the trie: {trie.toListOfWords()}")
+
+    serializedTrie = trie.serialize()
+    print(f"Serialized Trie: {serializedTrie}")
+
+    trieFromSerializedTrie = Trie.fromSerializedTrie(serializedTrie)
+    print(
+        f"List of words in new trie created from above serialized trie: {trieFromSerializedTrie.toListOfWords()}"
+    )
