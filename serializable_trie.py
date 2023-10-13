@@ -72,10 +72,40 @@ class Trie:
         storingList.append(">")
 
     @classmethod
-    def fromSerializedTrie(serializedTrie: str) -> Trie:
-        pass
+    def fromSerializedTrie(cls, serializedTrie: str) -> Trie:
+        trie = Trie()
+        trie.totalWords = cls.__fromSerializedTrie(trie.root, list(serializedTrie))[0]
+        return trie
+
+    @classmethod
+    def __fromSerializedTrie(
+        cls, curNode: TrieNode, serializedTrie: list[str], read: int = 0
+    ) -> tuple[int, int]:
+        wordsSeen = 0
+        if serializedTrie[read] == "]":
+            curNode.isValidWord = True
+            wordsSeen += 1
+            read += 1
+        while serializedTrie[read] != ">":
+            nextNode = curNode.children[serializedTrie[read]] = TrieNode()
+            read += 1
+            wordsSeenBySubtree, read = cls.__fromSerializedTrie(
+                nextNode, serializedTrie, read
+            )
+            wordsSeen += wordsSeenBySubtree
+        read += 1
+        curNode.wordsWithPrefix = wordsSeen
+        return wordsSeen, read
 
 
 if __name__ == "__main__":
-    trie = Trie(["hello", "chat", "chips", "chip"])
-    print(trie.serialize())
+    trie = Trie(["hello", "chat", "chip", "chips"])
+    print(f"List of words in the trie: {trie.toListOfWords()}")
+
+    serializedTrie = trie.serialize()
+    print(f"Serialized Trie: {serializedTrie}")
+
+    trieFromSerializedTrie = Trie.fromSerializedTrie(serializedTrie)
+    print(
+        f"List of words in new trie created from above serialized trie: {trieFromSerializedTrie.toListOfWords()}"
+    )
